@@ -1,10 +1,5 @@
 pipeline {
 agent any
-tools {
-    gradle "Gradle-5.3.1"
-    maven "3.6.1"
-    ant "1.10.5"
-  }
 parameters {
   choice(choices: '\n-v\n-vv\n-vvv\n-vvvv', description: 'Choose a verbosity level', name: 'VERBOSITY')
 }
