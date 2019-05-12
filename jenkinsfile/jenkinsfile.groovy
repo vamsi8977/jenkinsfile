@@ -20,7 +20,7 @@ environment {
       steps {
         echo 'Checking out project from Bitbucket....'
         dir("vamsi") {
-          git branch: 'master', url: 'git@github.com:vamsi8977/jenkinsfile.git'
+          git branch: 'master', url: 'https://github.com/vamsi8977/jenkinsfile.git'
         }
       }
     }
