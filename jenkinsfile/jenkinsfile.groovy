@@ -11,7 +11,7 @@ environment {
       inventoryName    = 'Bommasani'
 }
   stages {
-    stage('Checkout') {
+    stage('CheckOut') {
       steps {
         echo 'Checking out project from Bitbucket....'
         dir("vamsi") {
@@ -19,7 +19,7 @@ environment {
         }
       }
     }
-stage('shell') {
+stage('SHELL') {
       steps {
         ansiColor('xterm') {
           echo 'Cleaning workspace....'
@@ -36,7 +36,7 @@ stage('shell') {
         }
       }
     }
-stage('maven') {
+stage('MAVEN') {
       steps {
         ansiColor('xterm') {
           echo 'Cleaning workspace....'
@@ -47,7 +47,7 @@ stage('maven') {
         }
       }
     }
-stage('gradle') {
+stage('GRADLE') {
       steps {
         ansiColor('xterm') {
           echo 'Cleaning workspace....'
@@ -58,7 +58,7 @@ stage('gradle') {
         }
       }
     }
-stage('ant') {
+stage('ANT') {
       steps {
         ansiColor('xterm') {
           echo 'Cleaning workspace....'
