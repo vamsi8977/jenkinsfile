@@ -1,8 +1,5 @@
 pipeline {
 agent any
-parameters {
-  choice(choices: '\n-v\n-vv\n-vvv\n-vvvv', description: 'Choose a verbosity level', name: 'VERBOSITY')
-}
 options {
     buildDiscarder(logRotator(numToKeepStr:'10' , artifactNumToKeepStr: '10'))
     timestamps()
@@ -15,7 +12,7 @@ environment {
       steps {
         echo 'Checking out project from Bitbucket....'
         dir("vamsi") {
-          git branch: 'master', url: 'https://github.com/vamsi8977/jenkinsfile.git'
+          git branch: 'master', url: 'git@github.com:vamsi8977/jenkinsfile.git'
         }
       }
     }
