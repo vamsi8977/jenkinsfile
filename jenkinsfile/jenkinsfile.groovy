@@ -25,7 +25,6 @@ stage('SHELL') {
            mvn --version
            gradle -version
            ant -version
-           python --version
            ansible --version
            git --version
            terraform -v
@@ -75,9 +74,6 @@ stage('ANT') {
       }
       failure {
           echo "The build failed."
-          mail to: 'bommasani.vamsikrishna@gmail.com',
-                  subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
-                  body: "Something is wrong with ${env.BUILD_URL}"
       }
   }
 }
