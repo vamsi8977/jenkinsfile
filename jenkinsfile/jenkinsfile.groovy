@@ -71,7 +71,7 @@ stage('ANT') {
       success {
           archiveArtifacts artifacts: "vamsi/ant/build/jar/*.jar"
           archiveArtifacts artifacts: "vamsi/gradle/build/libs/*.jar"
-          archiveArtifacts artifacts: "vamsi/maven/target/*.war"
+          archiveArtifacts artifacts: "vamsi/maven/target/*.jar"
       }
       failure {
           echo "The build failed."

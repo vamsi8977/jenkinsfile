@@ -1,28 +1,31 @@
-apply plugin: 'java'
-apply plugin: 'eclipse'
-
-version = '1.0'
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
-
-//create a single Jar with all dependencies
-task fatJar(type: Jar) {
-	manifest {
-        attributes 'Implementation-Title': 'Gradle Jar File Example', 
-        	'Implementation-Version': version,
-        	'Main-Class': 'com.mkyong.DateUtils'
-    }
-    baseName = project.name + '-all'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
+plugins {
+    id 'groovy'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '5.2.0'
 }
 
-//Get dependencies from Maven central repository
 repositories {
-    mavenCentral()
+    jcenter()
+    flatDir {
+        dirs 'lib'
+    }
 }
 
-//Project dependencies
+archivesBaseName = 'gradle-example'
+
 dependencies {
-	compile 'ch.qos.logback:logback-classic:1.1.2'
+    implementation 'org.codehaus.groovy:groovy:3.+'
+
+    // Groovy module dependency
+    implementation 'org.codehaus.groovy:groovy-json:3.+'
+
+    // Strictly exact version of Maven dependency
+    implementation 'com.codevineyard:hello-world:1.0.1!!'
+
+    // Dependency from local jar
+    implementation ':simple-jar'
+}
+
+application {
+    mainClassName = 'com.adjectivecolournoun.gradle.Greetz'
 }
