@@ -72,6 +72,30 @@ stage('ANT') {
         }
       }
     }
+stage('NPM') {
+      steps {
+        ansiColor('xterm') {
+          echo 'Cleaning workspace....'
+           sh """
+          cd ${WORKSPACE}/vamsi/npm;
+          npm install
+          npm test
+          """
+        }
+      }
+    }
+stage('DotNet') {
+      steps {
+        ansiColor('xterm') {
+          echo 'Cleaning workspace....'
+           sh """
+          cd ${WORKSPACE}/vamsi/dotnet;
+          dotnet restore
+          dotnet build
+          """
+        }
+      }
+    }
   }//end stages
   post {
       success {
