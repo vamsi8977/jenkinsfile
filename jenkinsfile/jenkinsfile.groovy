@@ -3,6 +3,7 @@ agent any
 options {
     buildDiscarder(logRotator(numToKeepStr:'10' , artifactNumToKeepStr: '10'))
     timestamps()
+    cleanWs()
     }
 environment {
       inventoryName    = 'Bommasani'
@@ -42,7 +43,7 @@ stage('SHELL') {
 stage('MAVEN') {
       steps {
         ansiColor('xterm') {
-          echo 'Cleaning workspace....'
+          echo 'Maven Build....'
            sh """
           cd ${WORKSPACE}/vamsi/maven;
           mvn clean install
@@ -53,7 +54,7 @@ stage('MAVEN') {
 stage('GRADLE') {
       steps {
         ansiColor('xterm') {
-          echo 'Cleaning workspace....'
+          echo 'Gradle Build....'
            sh """
           cd ${WORKSPACE}/vamsi/gradle;
           ./gradlew clean build
@@ -64,7 +65,7 @@ stage('GRADLE') {
 stage('ANT') {
       steps {
         ansiColor('xterm') {
-          echo 'Cleaning workspace....'
+          echo 'Ant Build....'
            sh """
           cd ${WORKSPACE}/vamsi/ant;
           ant -buildfile build.xml
@@ -75,7 +76,7 @@ stage('ANT') {
 stage('NPM') {
       steps {
         ansiColor('xterm') {
-          echo 'Cleaning workspace....'
+          echo 'NPM Build....'
            sh """
           cd ${WORKSPACE}/vamsi/npm;
           npm install
@@ -87,7 +88,7 @@ stage('NPM') {
 stage('DotNet') {
       steps {
         ansiColor('xterm') {
-          echo 'Cleaning workspace....'
+          echo 'DotNet Build....'
            sh """
           cd ${WORKSPACE}/vamsi/dotnet;
           dotnet restore
@@ -99,6 +100,7 @@ stage('DotNet') {
   }//end stages
   post {
       success {
+          cleanWs()
           archiveArtifacts artifacts: "vamsi/ant/build/jar/*.jar"
           archiveArtifacts artifacts: "vamsi/gradle/build/libs/*.jar"
           archiveArtifacts artifacts: "vamsi/maven/target/*.jar"
