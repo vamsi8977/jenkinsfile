@@ -3,7 +3,6 @@ agent any
 options {
     buildDiscarder(logRotator(numToKeepStr:'10' , artifactNumToKeepStr: '10'))
     timestamps()
-    cleanWs()
     }
 environment {
       inventoryName    = 'Bommasani'
@@ -100,7 +99,6 @@ stage('DotNet') {
   }//end stages
   post {
       success {
-          cleanWs()
           archiveArtifacts artifacts: "vamsi/ant/build/jar/*.jar"
           archiveArtifacts artifacts: "vamsi/gradle/build/libs/*.jar"
           archiveArtifacts artifacts: "vamsi/maven/target/*.jar"
@@ -108,5 +106,8 @@ stage('DotNet') {
       failure {
           echo "The build failed."
       }
-  }
+      cleanup{
+        deleteDir()
+      }
+    }
 }
