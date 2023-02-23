@@ -21,13 +21,20 @@ stage('SHELL') {
         ansiColor('xterm') {
           echo 'Cleaning workspace....'
            sh """
-           java -version
-           mvn --version
-           gradle -version
-           ant -version
-           ansible --version
-           git --version
-           terraform -v
+            java -version
+            mvn --version
+            gradle -version
+            ant -version
+            ansible --version
+            git --version
+            terraform -v
+            ruby -v
+            aws --version
+            az --version
+            kubectl version --output=yaml
+            docker version
+            dotnet --version
+            node -v
           """
         }
       }
@@ -49,7 +56,7 @@ stage('GRADLE') {
           echo 'Cleaning workspace....'
            sh """
           cd ${WORKSPACE}/vamsi/gradle;
-          gradle clean build
+          ./gradlew clean build
           """
         }
       }
