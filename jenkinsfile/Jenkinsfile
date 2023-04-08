@@ -31,7 +31,6 @@ stage('SHELL') {
             ruby -v
             aws --version
             az --version
-            docker version
             node -v
           """
         }
