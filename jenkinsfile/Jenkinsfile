@@ -72,7 +72,7 @@ parameters {
           echo 'Gradle Build....'
           sh """
             cd ${WORKSPACE}/gradle;
-            ./gradlew clean build
+            ./gradlew build
             ./gradlew sonar
           """
         }
