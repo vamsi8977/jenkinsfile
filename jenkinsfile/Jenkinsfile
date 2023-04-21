@@ -61,7 +61,7 @@ parameters {
           sh """
             cd ${WORKSPACE}/maven;
             mvn clean install
-            mvn sonar:sonar -Dsonar.projectKey=maven -Dsonar.projectName='maven_sample
+            mvn sonar:sonar -Dsonar.projectKey=maven -Dsonar.projectName='maven_sample'
           """
         }
       }
