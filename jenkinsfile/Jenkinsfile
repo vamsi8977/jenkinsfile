@@ -92,7 +92,7 @@ stage ('Archive Artifacts') {
   post {
       success {
         script {
-            sh "git tag -a v${env.BUILD_NUMBER} -m 'Successful build'"
+            sh "git tag -a 1.0.0.${env.BUILD_NUMBER} -m 'Successful build'"
             sh "git push --tags git@github.com:vamsi8977/jenkinsfile.git"
         }
       }
