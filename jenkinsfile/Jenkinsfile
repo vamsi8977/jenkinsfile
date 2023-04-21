@@ -42,7 +42,7 @@ stage('MAVEN') {
         ansiColor('xterm') {
           echo 'Maven Build....'
            sh """
-          cd ${WORKSPACE}/vamsi/maven;
+          cd ${WORKSPACE}/maven;
           mvn clean install
           """
         }
@@ -53,7 +53,7 @@ stage('GRADLE') {
         ansiColor('xterm') {
           echo 'Gradle Build....'
            sh """
-          cd ${WORKSPACE}/vamsi/gradle;
+          cd ${WORKSPACE}/gradle;
           ./gradlew clean build
           """
         }
@@ -64,7 +64,7 @@ stage('ANT') {
         ansiColor('xterm') {
           echo 'Ant Build....'
            sh """
-          cd ${WORKSPACE}/vamsi/ant;
+          cd ${WORKSPACE}/ant;
           ant -buildfile build.xml
           """
         }
@@ -75,7 +75,7 @@ stage('NPM') {
         ansiColor('xterm') {
           echo 'NPM Build....'
            sh """
-          cd ${WORKSPACE}/vamsi/npm;
+          cd ${WORKSPACE}/npm;
           npm install
           npm test
           """
@@ -84,9 +84,9 @@ stage('NPM') {
     }
 stage ('Archive Artifacts') {
   steps {
-    archiveArtifacts artifacts: "vamsi/ant/build/jar/*.jar"
-    archiveArtifacts artifacts: "vamsi/gradle/build/libs/*.jar"
-    archiveArtifacts artifacts: "vamsi/maven/target/*.jar"
+    archiveArtifacts artifacts: "ant/build/jar/*.jar"
+    archiveArtifacts artifacts: "gradle/build/libs/*.jar"
+    archiveArtifacts artifacts: "maven/target/*.jar"
   }
 }
   }//end stages
