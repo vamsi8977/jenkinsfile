@@ -73,6 +73,7 @@ parameters {
           sh """
             cd ${WORKSPACE}/gradle;
             ./gradlew clean build
+            ./gradlew sonar
           """
         }
       }
@@ -84,6 +85,7 @@ parameters {
           sh """
             cd ${WORKSPACE}/ant;
             ant -buildfile build.xml
+            sonar-scanner
           """
         }
       }
@@ -96,6 +98,7 @@ parameters {
             cd ${WORKSPACE}/nodejs;
             npm install
             npm test
+            sonar-scanner
           """
         }
       }
