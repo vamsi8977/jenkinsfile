@@ -12,7 +12,7 @@ environment {
       steps {
         echo 'Checking out project from Bitbucket....'
         dir("vamsi") {
-          git branch: 'master', url: 'https://github.com/vamsi8977/jenkinsfile.git'
+          git branch: 'master', url: 'git@github.com:vamsi8977/jenkinsfile.git'
         }
       }
     }
@@ -92,10 +92,8 @@ stage ('Archive Artifacts') {
   post {
       success {
         script {
-          withCredentials([usernamePassword(credentialsId: 'github', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
             sh "git tag -a v${env.BUILD_NUMBER} -m 'Successful build'"
-            sh "git push --tags https://${USERNAME}:${PASSWORD}@github.com/vamsi8977/jenkinsfile.git"
-          }
+            sh "git push --tags git@github.com:vamsi8977/jenkinsfile.git"
         }
       }
       failure {
