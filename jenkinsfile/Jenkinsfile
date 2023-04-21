@@ -8,14 +8,15 @@ environment {
       inventoryName    = 'Bommasani'
 }
   stages {
-    stage('CheckOut') {
+    stage('Checkout') {
       steps {
-        echo 'Checking out project from Bitbucket....'
-        dir("vamsi") {
-          git branch: 'master', url: 'git@github.com:vamsi8977/jenkinsfile.git'
+        sh "git fetch --tags"
+        script {
+          def latestTag = sh(returnStdout: true, script: 'git describe --tags `git rev-list --tags --max-count=1`').trim()
+          checkout([$class: 'GitSCM', branches: [[name: "refs/tags/${latestTag}"]], userRemoteConfigs: [[url: 'git@github.com:vamsi8977/jenkinsfile.git']]])
+                }
+            }
         }
-      }
-    }
 stage('SHELL') {
       steps {
         ansiColor('xterm') {
@@ -104,3 +105,6 @@ stage ('Archive Artifacts') {
       }
     }
 }
+
+
+    
