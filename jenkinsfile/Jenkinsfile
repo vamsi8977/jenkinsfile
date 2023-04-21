@@ -3,10 +3,10 @@ agent any
 options {
   buildDiscarder(logRotator(numToKeepStr:'2' , artifactNumToKeepStr: '2'))
   timestamps()
-    }
+  }
 environment {
-  inventoryName    = 'Bommasani'
-}
+  inventoryName = 'Bommasani'
+  }
 parameters {
   gitParameter name: 'TAG',
                type: 'PT_TAG',
@@ -25,20 +25,20 @@ parameters {
     stage('Checkout') {
       steps {
         checkout([$class: 'GitSCM',
-                  branches: [[name: "${params.TAG}"]],
-                  doGenerateSubmoduleConfigurations: false,
-                  extensions: [],
-                  gitTool: 'Default',
-                  submoduleCfg: [],
-                  userRemoteConfigs: [[url: 'git@github.com:vamsi8977/jenkinsfile.git']]
-                ])
+          branches: [[name: "${params.TAG}"]],
+          doGenerateSubmoduleConfigurations: false,
+          extensions: [],
+          gitTool: 'Default',
+          submoduleCfg: [],
+          userRemoteConfigs: [[url: 'git@github.com:vamsi8977/jenkinsfile.git']]
+              ])
             }
         }
     stage('SHELL') {
       steps {
         ansiColor('xterm') {
           echo 'Cleaning workspace....'
-           sh """
+          sh """
             java -version
             mvn --version
             gradle -version
@@ -54,47 +54,51 @@ parameters {
         }
       }
     }
-    stage('MAVEN') {
+    stage('Maven') {
       steps {
-        ansiColor('xterm') {
+        withSonarQubeEnv('SonarQube') {
           echo 'Maven Build....'
-           sh """
-          cd ${WORKSPACE}/maven;
-          mvn clean install
+          sh """
+            cd ${WORKSPACE}/maven;
+            mvn clean install
+            mvn sonar:sonar -Dsonar.projectKey=maven -Dsonar.projectName='maven_sample
           """
         }
       }
     }
-    stage('GRADLE') {
+    stage('Gradle') {
       steps {
-        ansiColor('xterm') {
+        withSonarQubeEnv('SonarQube') {
           echo 'Gradle Build....'
-           sh """
-          cd ${WORKSPACE}/gradle;
-          ./gradlew clean build
+          sh """
+            cd ${WORKSPACE}/gradle;
+            ./gradlew clean build
+            ./gradlew sonar
           """
         }
       }
     }
-    stage('ANT') {
+    stage('Ant') {
       steps {
-        ansiColor('xterm') {
+        withSonarQubeEnv('SonarQube') {
           echo 'Ant Build....'
-           sh """
-          cd ${WORKSPACE}/ant;
-          ant -buildfile build.xml
+          sh """
+            cd ${WORKSPACE}/ant;
+            ant -buildfile build.xml
+            sonar-scanner
           """
         }
       }
     }
-    stage('NPM') {
+    stage('NodeJS') {
       steps {
-        ansiColor('xterm') {
-          echo 'NPM Build....'
-           sh """
-          cd ${WORKSPACE}/npm;
-          npm install
-          npm test
+        withSonarQubeEnv('SonarQube') {
+          echo 'NodeJS Build....'
+          sh """
+            cd ${WORKSPACE}/nodejs;
+            npm install
+            npm test
+            sonar-scanner
           """
         }
       }
@@ -110,12 +114,12 @@ parameters {
   post {
       success {
         script {
-            sh "git tag -a 1.0.0.${env.BUILD_NUMBER} -m 'Successful build'"
-            sh "git push --tags git@github.com:vamsi8977/jenkinsfile.git"
+          sh "git tag -a 1.0.0.${env.BUILD_NUMBER} -m 'Successful build'"
+          sh "git push --tags git@github.com:vamsi8977/jenkinsfile.git"
         }
       }
       failure {
-          echo "The build failed."
+        echo "The build failed."
       }
       cleanup{
         deleteDir()
