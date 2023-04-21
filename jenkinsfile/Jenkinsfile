@@ -1,14 +1,19 @@
 pipeline {
 agent any
 options {
-    buildDiscarder(logRotator(numToKeepStr:'2' , artifactNumToKeepStr: '2'))
-    timestamps()
+  buildDiscarder(logRotator(numToKeepStr:'2' , artifactNumToKeepStr: '2'))
+  timestamps()
     }
 environment {
-      inventoryName    = 'Bommasani'
+  inventoryName    = 'Bommasani'
 }
+parameters {
+  gitParameter name: 'TAG',
+               type: 'PT_TAG',
+               defaultValue: 'master'
+    }
   stages {
-    stage('Checkout') {
+/*    stage('Checkout') {
       steps {
         sh "git fetch --tags"
         script {
@@ -16,8 +21,22 @@ environment {
           checkout([$class: 'GitSCM', branches: [[name: "refs/tags/${latestTag}"]], userRemoteConfigs: [[url: 'git@github.com:vamsi8977/jenkinsfile.git']]])
                 }
             }
+        } */
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout([$class: 'GitSCM',
+                          branches: [[name: "${params.TAG}"]],
+                          doGenerateSubmoduleConfigurations: false,
+                          extensions: [],
+                          gitTool: 'Default',
+                          submoduleCfg: [],
+                          userRemoteConfigs: [[url: 'git@github.com:vamsi8977/jenkinsfile.git']]
+                        ])
+            }
         }
-stage('SHELL') {
+    }
+    stage('SHELL') {
       steps {
         ansiColor('xterm') {
           echo 'Cleaning workspace....'
@@ -37,7 +56,7 @@ stage('SHELL') {
         }
       }
     }
-stage('MAVEN') {
+    stage('MAVEN') {
       steps {
         ansiColor('xterm') {
           echo 'Maven Build....'
@@ -48,7 +67,7 @@ stage('MAVEN') {
         }
       }
     }
-stage('GRADLE') {
+    stage('GRADLE') {
       steps {
         ansiColor('xterm') {
           echo 'Gradle Build....'
@@ -59,7 +78,7 @@ stage('GRADLE') {
         }
       }
     }
-stage('ANT') {
+    stage('ANT') {
       steps {
         ansiColor('xterm') {
           echo 'Ant Build....'
@@ -70,7 +89,7 @@ stage('ANT') {
         }
       }
     }
-stage('NPM') {
+    stage('NPM') {
       steps {
         ansiColor('xterm') {
           echo 'NPM Build....'
@@ -82,13 +101,13 @@ stage('NPM') {
         }
       }
     }
-stage ('Archive Artifacts') {
-  steps {
-    archiveArtifacts artifacts: "ant/build/jar/*.jar"
-    archiveArtifacts artifacts: "gradle/build/libs/*.jar"
-    archiveArtifacts artifacts: "maven/target/*.jar"
-  }
-}
+    stage ('Archive Artifacts') {
+      steps {
+        archiveArtifacts artifacts: "ant/build/jar/*.jar"
+        archiveArtifacts artifacts: "gradle/build/libs/*.jar"
+        archiveArtifacts artifacts: "maven/target/*.jar"
+      }
+    }
   }//end stages
   post {
       success {
@@ -105,6 +124,3 @@ stage ('Archive Artifacts') {
       }
     }
 }
-
-
-    
