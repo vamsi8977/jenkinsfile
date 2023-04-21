@@ -78,6 +78,17 @@ parameters {
         }
       }
     }
+    stage('Gradle_sonar') {
+      steps {
+        withSonarQubeEnv('SonarQube') {
+          echo 'Gradle Build....'
+          sh """
+            cd ${WORKSPACE}/gradle;
+            ./gradlew sonar
+          """
+        }
+      }
+    }
     stage('Ant') {
       steps {
         withSonarQubeEnv('SonarQube') {
