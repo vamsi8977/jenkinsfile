@@ -92,9 +92,11 @@ stage ('Archive Artifacts') {
   post {
       success {
         script {
-          sh "git tag -a 1.0.0.${env.BUILD_NUMBER} -m 'Build successful'"
-          sh "git push origin 1.0.0.${env.BUILD_NUMBER}"
+          withCredentials([usernamePassword(credentialsId: 'github', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+            sh "git tag -a v${env.BUILD_NUMBER} -m 'Successful build'"
+            sh "git push --tags https://${USERNAME}:${PASSWORD}@github.com/vamsi8977/jenkinsfile.git"
           }
+        }
       }
       failure {
           echo "The build failed."
