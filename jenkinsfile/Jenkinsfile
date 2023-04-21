@@ -72,7 +72,18 @@ parameters {
           echo 'Gradle Build....'
           sh """
             cd ${WORKSPACE}/gradle;
-            ./gradlew build
+            ./gradlew clean build
+            ./gradlew sonar
+          """
+        }
+      }
+    }
+    stage('Gradle_Sonar') {
+      steps {
+        withSonarQubeEnv('SonarQube') {
+          echo 'Gradle Build....'
+          sh """
+            cd ${WORKSPACE}/gradle;
             ./gradlew sonar
           """
         }
