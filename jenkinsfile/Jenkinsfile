@@ -81,12 +81,20 @@ stage('NPM') {
         }
       }
     }
+stage ('Archive Artifacts') {
+  steps {
+    archiveArtifacts artifacts: "vamsi/ant/build/jar/*.jar"
+    archiveArtifacts artifacts: "vamsi/gradle/build/libs/*.jar"
+    archiveArtifacts artifacts: "vamsi/maven/target/*.jar"
+  }
+}
   }//end stages
   post {
       success {
-          archiveArtifacts artifacts: "vamsi/ant/build/jar/*.jar"
-          archiveArtifacts artifacts: "vamsi/gradle/build/libs/*.jar"
-          archiveArtifacts artifacts: "vamsi/maven/target/*.jar"
+        script {
+          sh "git tag -a 1.0.0.${env.BUILD_NUMBER} -m 'Build successful'"
+          sh "git push origin 1.0.0.${env.BUILD_NUMBER}"
+          }
       }
       failure {
           echo "The build failed."
