@@ -137,7 +137,7 @@ pipeline {
         archiveArtifacts artifacts: "ant/build/jar/*.jar"
         archiveArtifacts artifacts: "gradle/build/libs/*.jar"
         archiveArtifacts artifacts: "maven/target/*.jar"
-        archiveArtifacts artifacts: "nodejs/test/config.json"
+        archiveArtifacts artifacts: "nodejs/out/test-results.xml"
       }
     }
   }
