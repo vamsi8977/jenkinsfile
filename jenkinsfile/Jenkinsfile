@@ -28,6 +28,7 @@ pipeline {
     } */
     stage('SCM') {
       steps {
+        cleanWs()
         script {
           def parallelStages = [:]
             switch (params.parallelOption) {
