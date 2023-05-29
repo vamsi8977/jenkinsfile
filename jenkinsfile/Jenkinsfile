@@ -1,29 +1,21 @@
 pipeline {
-agent any
-options {
-  buildDiscarder(logRotator(numToKeepStr:'2' , artifactNumToKeepStr: '2'))
-  timestamps()
+  agent any
+  options {
+    buildDiscarder(logRotator(numToKeepStr:'2' , artifactNumToKeepStr: '2'))
+    timestamps()
   }
-environment {
-  inventoryName = 'Bommasani'
+  environment {
+    inventoryName = 'Bommasani'
   }
-parameters {
-  gitParameter name: 'TAG',
-               type: 'PT_TAG',
-               defaultValue: 'master'
+  parameters {
+    choice(name: 'parallelOption', choices: ['branch', 'tag'], description: 'Select parallel option')
+    gitParameter name: 'TAG',
+                type: 'PT_TAG',
+                defaultValue: 'master'
     }
   stages {
-/*    stage('Checkout') {
-      steps {
-        sh "git fetch --tags"
-        script {
-          def latestTag = sh(returnStdout: true, script: 'git describe --tags `git rev-list --tags --max-count=1`').trim()
-          checkout([$class: 'GitSCM', branches: [[name: "refs/tags/${latestTag}"]], userRemoteConfigs: [[url: 'git@github.com:vamsi8977/jenkinsfile.git']]])
-                }
-            }
-        } */
-    stage('Checkout') {
-      steps {
+    /* stage('SCM') {
+      steps { // shows the latest tag
         checkout([$class: 'GitSCM',
           branches: [[name: "${params.TAG}"]],
           doGenerateSubmoduleConfigurations: false,
@@ -32,12 +24,39 @@ parameters {
           submoduleCfg: [],
           userRemoteConfigs: [[url: 'git@github.com:vamsi8977/jenkinsfile.git']]
               ])
-            }
         }
-    stage('SHELL') {
+    } */
+    stage('SCM') {
+      steps {
+        script {
+          def parallelStages = [:]
+            switch (params.parallelOption) {
+              case 'branch':
+                parallelStages['Branch'] = {
+                  git branch: 'master', url: 'git@github.com:vamsi8977/jenkinsfile.git'
+                }
+                break
+              case 'tag':
+                parallelStages['Tag'] = {
+                  sh "git fetch --tags"
+                    script {
+                      def latestTag = sh(returnStdout: true, script: 'git describe --tags `git rev-list --tags --max-count=1`').trim()
+                        checkout([$class: 'GitSCM', branches: [[name: "refs/tags/${latestTag}"]], userRemoteConfigs: [[url: 'git@github.com:vamsi8977/jenkinsfile.git']]])
+                    }
+                }
+                break
+              default:
+                echo "Invalid option selected"
+                  return
+            }
+            parallel parallelStages
+        }
+      }
+    }
+    stage('Validate') {
       steps {
         ansiColor('xterm') {
-          echo 'Cleaning workspace....'
+          echo 'Check Tools Versions....'
           sh """
             java -version
             mvn --version
@@ -62,6 +81,8 @@ parameters {
             cd ${WORKSPACE}/maven;
             mvn clean install
             mvn sonar:sonar -Dsonar.projectKey=maven -Dsonar.projectName='maven_sample'
+            jf rt u target/javaparser-maven-sample-1.0-SNAPSHOT.jar maven/
+            jf scan target/*.jar --fail-no-op --build-name=maven --build-number=$BUILD_NUMBER
           """
         }
       }
@@ -74,6 +95,8 @@ parameters {
             cd ${WORKSPACE}/gradle;
             ./gradlew clean build
             ./gradlew sonar
+            jf rt u build/libs/*.jar gradle/
+            jf scan build/libs/*.jar --fail-no-op --build-name=gradle --build-number=$BUILD_NUMBER
           """
         }
       }
@@ -86,6 +109,8 @@ parameters {
             cd ${WORKSPACE}/ant;
             ant -buildfile build.xml
             sonar-scanner
+            jf rt u build/jar/*.jar ant/
+            jf scan build/jar/*.jar --fail-no-op --build-name=ant --build-number=$BUILD_NUMBER
           """
         }
       }
@@ -97,8 +122,11 @@ parameters {
           sh """
             cd ${WORKSPACE}/nodejs;
             npm install
+            npm audit fix --force
             npm test
             sonar-scanner
+            jf rt u test/config.json nodejs/
+            jf scan test/config.json --fail-no-op --build-name=nodejs --build-number=$BUILD_NUMBER
           """
         }
       }
@@ -108,21 +136,22 @@ parameters {
         archiveArtifacts artifacts: "ant/build/jar/*.jar"
         archiveArtifacts artifacts: "gradle/build/libs/*.jar"
         archiveArtifacts artifacts: "maven/target/*.jar"
+        archiveArtifacts artifacts: "nodejs/test/config.json"
       }
     }
-  }//end stages
+  }
   post {
-      success {
-        script {
-          sh "git tag -a 1.0.0.${env.BUILD_NUMBER} -m 'Successful build'"
-          sh "git push --tags git@github.com:vamsi8977/jenkinsfile.git"
-        }
-      }
-      failure {
-        echo "The build failed."
-      }
-      cleanup{
-        deleteDir()
+    success {
+      script {
+        sh "git tag -a 1.0.0.${env.BUILD_NUMBER} -m 'Successful build'"
+        sh "git push --tags git@github.com:vamsi8977/jenkinsfile.git"
       }
     }
+    failure {
+      echo "The build failed."
+    }
+    cleanup {
+      deleteDir()
+    }
+  }
 }
