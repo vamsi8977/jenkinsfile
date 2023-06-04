@@ -44,10 +44,18 @@ pipeline {
               break
             case 'tag':
               parallelStages['Tag'] = {
-                sh "git fetch --tags"
-                script {
-                  def latestTag = sh(returnStdout: true, script: 'git describe --tags `git rev-list --tags --max-count=1`').trim()
-                  checkout([$class: 'GitSCM', branches: [[name: "refs/tags/${latestTag}"]], userRemoteConfigs: [[url: params.url]]])
+                dir('temp') {
+                  sh "git init"
+                  sh "git fetch --tags"
+                  script {
+                    def latestTag = sh(returnStdout: true, script: 'git describe --tags `git rev-list --tags --max-count=1` 2>/dev/null').trim()
+                    if (latestTag) {
+                      echo "Latest tag: $latestTag"
+                      checkout([$class: 'GitSCM', branches: [[name: "refs/tags/${latestTag}"]], userRemoteConfigs: [[url: params.url]]])
+                    } else {
+                      echo "No tags found in the repository."
+                    }
+                  }
                 }
               }
               break
