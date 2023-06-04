@@ -12,11 +12,8 @@ pipeline {
   }
   parameters {
     choice(name: 'parallelOption', choices: ['branch', 'tag'], description: 'Select parallel option')
-    string(name: 'url', defaultValue: 'https://github.com/vamsi8977/jenkinsfile.git', description: 'Git URL')
+    string(name: 'url', defaultValue: 'git@github.com:vamsi8977/jenkinsfile.git', description: 'Git URL')
     string(name: 'branch', defaultValue: 'main', description: 'Git Branch')
-    gitParameter name: 'TAG',
-                type: 'PT_TAG',
-                defaultValue: 'master'
     }
   stages {
     /* stage('SCM') {
@@ -31,7 +28,7 @@ pipeline {
               ])
         }
     } */
-    stage('SCM') {
+    /*stage('SCM') {
       steps {
         cleanWs()
         script {
@@ -44,10 +41,18 @@ pipeline {
               break
             case 'tag':
               parallelStages['Tag'] = {
-                sh "git fetch --tags"
-                script {
-                  def latestTag = sh(returnStdout: true, script: 'git describe --tags `git rev-list --tags --max-count=1`').trim()
-                  checkout([$class: 'GitSCM', branches: [[name: "refs/tags/${latestTag}"]], userRemoteConfigs: [[url: params.url]]])
+                dir('temp') {
+                  sh "git init"
+                  sh "git fetch --tags"
+                  script {
+                    def latestTag = sh(returnStdout: true, script: 'git describe --tags `git rev-list --tags --max-count=1` 2>/dev/null').trim()
+                    if (latestTag) {
+                      echo "Latest tag: $latestTag"
+                      checkout([$class: 'GitSCM', branches: [[name: "refs/tags/${latestTag}"]], userRemoteConfigs: [[url: params.url]]])
+                    } else {
+                      echo "No tags found in the repository."
+                    }
+                  }
                 }
               }
               break
@@ -57,6 +62,16 @@ pipeline {
           }
           parallel parallelStages
         }
+      }
+    } */
+    stage('CheckOut') {
+      steps {
+        echo 'Checking out project from Bitbucket....'
+        checkout([
+          $class: 'GitSCM',
+          branches: [[name: params.branch]],
+          userRemoteConfigs: [[url: params.url]]
+        ])
       }
     }
     stage('Validate') {
