@@ -44,6 +44,7 @@ pipeline {
               break
             case 'tag':
               parallelStages['Tag'] = {
+                sh "git init"
                 sh "git fetch --tags"
                 script {
                   def latestTag = sh(returnStdout: true, script: 'git describe --tags `git rev-list --tags --max-count=1`').trim()
