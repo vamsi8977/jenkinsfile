@@ -79,11 +79,14 @@ pipeline {
         ansiColor('xterm') {
           echo 'Check Tools Versions....'
           script {
-            def tools = ['java', 'mvn', 'gradle', 'ansible', 'git', 'terraform', 'ruby', 'aws', 'az', 'node', 'yarn']
+            def tools = ['java', 'mvn', 'gradle', 'ansible', 'git', 'terraform', 'ruby', 'aws', 'az', 'node', 'yarn', 'docker']
             tools.each { tool ->
               sh "$tool --version"
             }
-            sh 'ant -version'
+            sh """
+              ant -version
+              helm version
+            """
           }
         }
       }
